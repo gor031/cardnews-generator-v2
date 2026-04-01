@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId} (matches auth.uid)
+    // Fields:
+    //   - uid: string (required) - matches document ID
+    //   - email: string (required)
+    //   - displayName: string (optional)
+    //   - photoURL: string (optional)
+    //   - role: string (required) - 'user', 'creator', 'admin'
+    //   - points: number (required) - >= 0
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: templates
+    // Document ID: auto-generated
+    // Fields:
+    //   - id: string (required)
+    //   - authorId: string (required) - matches creator's uid
+    //   - authorName: string (required)
+    //   - title: string (required)
+    //   - description: string (optional)
+    //   - pricePoints: number (required) - >= 0
+    //   - jsonData: string (required) - JSON string of template data
+    //   - downloads: number (required) - >= 0
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "gog031103@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isCreator() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'creator' ||
+        isAdmin()
+      );
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'points', 'createdAt']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.role in ['user', 'creator', 'admin'] &&
+             data.points is number && data.points >= 0 &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidTemplate(data) {
+      return data.keys().hasAll(['id', 'authorId', 'authorName', 'title', 'pricePoints', 'jsonData', 'downloads', 'createdAt']) &&
+             data.id is string &&
+             data.authorId is string &&
+             data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 50 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
+             data.pricePoints is number && data.pricePoints >= 0 &&
+             data.jsonData is string && data.jsonData.size() <= 500000 && // 500KB max
+             data.downloads is number && data.downloads >= 0 &&
+             data.createdAt is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Users can read their own profile. Admins can read all.
+      // We also allow reading other users' basic info if needed, but let's restrict to owner/admin for safety.
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can create their own profile, but cannot give themselves creator/admin roles or points.
+      allow create: if isOwner(userId) && 
+                       isValidUser(request.resource.data) && 
+                       request.resource.data.uid == userId &&
+                       (request.resource.data.role == 'user' || isAdmin()) &&
+                       (request.resource.data.points == 0 || isAdmin());
+                       
+      // Users can update their own profile (e.g., displayName), but cannot change role.
+      // Allow points to be updated for transactions (charging, buying, selling).
+      allow update: if (isOwner(userId) && 
+                        isValidUser(request.resource.data) &&
+                        request.resource.data.uid == resource.data.uid &&
+                        request.resource.data.role == resource.data.role &&
+                        request.resource.data.createdAt == resource.data.createdAt) || 
+                       (isAuthenticated() && 
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']) &&
+                        request.resource.data.points >= 0) ||
+                       (isAdmin() && isValidUser(request.resource.data));
+                       
+      allow delete: if isAdmin();
+    }
+
+    match /templates/{templateId} {
+      // Anyone authenticated can view templates in the marketplace
+      allow read: if isAuthenticated();
+      
+      // Only creators and admins can create templates
+      allow create: if isCreator() && 
+                       isValidTemplate(request.resource.data) &&
+                       request.resource.data.authorId == request.auth.uid &&
+                       request.resource.data.downloads == 0;
+                       
+      // Creators can update their own templates (e.g., title, description). 
+      // Anyone can increment downloads (simulated purchase for now).
+      allow update: if isAuthenticated() && isValidTemplate(request.resource.data) && (
+                        // Owner updating their template
+                        (request.resource.data.authorId == request.auth.uid &&
+                         request.resource.data.authorId == resource.data.authorId &&
+                         request.resource.data.createdAt == resource.data.createdAt) ||
+                        // Admin updating
+                        isAdmin() ||
+                        // Any user incrementing downloads (only downloads field changes)
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']) &&
+                         request.resource.data.downloads == resource.data.downloads + 1)
+                      );
+                      
+      allow delete: if (isAuthenticated() && resource.data.authorId == request.auth.uid) || isAdmin();
+    }
+  }
+}
