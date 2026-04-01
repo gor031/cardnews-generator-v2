@@ -1,0 +1,19 @@
+
+npm warn cleanup     [Error: EBUSY: resource busy or locked, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\esbuild'] {
+npm warn cleanup       errno: -4082,
+npm warn cleanup     [Error: EBUSY: resource busy or locked, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\protobufjs'] {
+npm warn cleanup       errno: -4082,
+npm warn cleanup     [Error: EBUSY: resource busy or locked, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\esbuild'] {
+npm warn cleanup       errno: -4082,
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\@grpc\grpc-js\build\src'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\@grpc\grpc-js'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\@firebase\firestore'] {
+npm warn cleanup       errno: -4048,
+npm error code 3221225477
+npm error path C:\Users\User\Downloads\remix_-copy-of-移대뱶?댁뒪-?앹꽦湲?\node_modules\@firebase\util
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node ./postinstall.js
+npm error A complete log of this run can be found in: C:\Users\User\AppData\Local\npm-cache\_logs\2026-04-01T00_43_01_833Z-debug-0.log
+

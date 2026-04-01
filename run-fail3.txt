@@ -1,0 +1,10 @@
+deploy	Deploy to Netlify	癤?026-04-01T03:40:05.3543169Z ##[group]Run npx netlify-cli deploy --prod --dir=dist
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3543610Z [36;1mnpx netlify-cli deploy --prod --dir=dist[0m
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3570246Z shell: /usr/bin/bash -e {0}
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3570501Z env:
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3571029Z   NETLIFY_AUTH_TOKEN: ***
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3571325Z   NETLIFY_SITE_ID: ***
+deploy	Deploy to Netlify	2026-04-01T03:40:05.3571525Z ##[endgroup]
+deploy	Deploy to Netlify	2026-04-01T03:40:06.1146931Z npm warn exec The following package was not found and will be installed: netlify-cli@24.9.0
+deploy	Deploy to Netlify	2026-04-01T03:40:28.4484452Z  ??  Error: Unauthorized: could not retrieve project
+deploy	Deploy to Netlify	2026-04-01T03:40:28.4966102Z ##[error]Process completed with exit code 1.

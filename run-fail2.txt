@@ -1,0 +1,9 @@
+deploy	Deploy to Netlify	癤?026-04-01T03:04:50.6823251Z ##[group]Run nwtgck/actions-netlify@v3
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6823560Z with:
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6823747Z   publish-dir: ./dist
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6823968Z   production-deploy: true
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6824186Z env:
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6824741Z   NETLIFY_AUTH_TOKEN: ***
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6825038Z   NETLIFY_SITE_ID: ***
+deploy	Deploy to Netlify	2026-04-01T03:04:50.6825239Z ##[endgroup]
+deploy	Deploy to Netlify	2026-04-01T03:04:51.7449520Z ##[error]Not Found
